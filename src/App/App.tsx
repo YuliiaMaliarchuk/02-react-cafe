@@ -1,14 +1,44 @@
-import ClickCounter from '../ClickCounter/ClickCounter';
-// import styles from './App.module.css';
-// import FeedbackButtons from '../FeedbackButtons/FeedbackButtons';
-// import Statistic from '../Statistic/Statistic';
+import { useState } from 'react';
+import css from './App.module.css';
+import CafeInfo from '../CafeInfo/CafeInfo';
+import VoteOptions from '../VoteOptions/VoteOptions';
+import { VoteStats } from '../VoteStats/VoteStats';
+import { Notification } from '../Notification/Notification';
+import { VotesType,Votes } from '../types/votes';
 
 export default function App() {
+    const [votes, setVotes] = useState({
+        good: 0,
+        neutral: 0,
+        bad: 0
+    });
+    const handleVote = (type: VotesType) => { 
+        setVotes((prevVotes) => ({
+            ...prevVotes,
+            [type]: prevVotes[type] + 1,
+        }))
+    }
+
+    const resetVotes = () => {
+        setVotes({ good: 0, neutral: 0, bad: 0 })
+    };
+
+    const totalVotes = votes.good + votes.neutral + votes.bad;
+    const positiveRate = totalVotes
+    ? Math.round((votes.good / totalVotes) * 100)
+    : 0
+
     return (
         <>
-            <ClickCounter value='good' />
-            <ClickCounter value='neutral' />
-            <ClickCounter value='bad' />
+            <div className={css.app}>
+                <CafeInfo />
+                <VoteOptions
+                onVote={handleVote} 
+                onReset={resetVotes} 
+                canReset={true}
+                />
+                <VoteStats votes={votes} totalVotes={totalVotes} positiveRate={positiveRate} />
+            </div>
         </>
     );
 }
